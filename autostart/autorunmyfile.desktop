@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=<TCE>
+Comment =
+Exec= python3 /home/pi/Desktop/sum_up/TCE.py
+StartupNotify=false
+Terminal=true
+Hidden=false

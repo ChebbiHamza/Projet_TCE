@@ -1,0 +1,4 @@
+adress: raspberrypiTCE@gmail.com
+pass: pi@raspberrypi
+phone :22640229
+birth : my birth
