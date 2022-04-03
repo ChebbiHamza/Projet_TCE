@@ -1,10 +1,10 @@
-# Import modules
+# Importer les modules
 import smtplib
 import ssl
 # email.mime subclasses
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-# The pandas library is only for generating the current date, which is not necessary for sending emails
+# La bibliothèque pandas sert uniquement à générer la date actuelle, ce qui n'est pas nécessaire pour envoyer des e-mails
 import pandas as pd
 # atttch
 from email.mime.application import MIMEApplication
@@ -12,7 +12,7 @@ import csv
 import urllib.request
 
 
-def connect(host='http://google.com'):  # to check if there is internet acces
+def connect(host='http://google.com'):  # vérifier l'accés internet
     try:
         urllib.request.urlopen(host)  # Python 3.x
         return True
@@ -21,79 +21,59 @@ def connect(host='http://google.com'):  # to check if there is internet acces
 
 
 def send_mail():
-    # Define the HTML document
-    html = '''
+
+    a = pd.read_csv("/home/pi/Desktop/PFE_TCE/Main/csv_register/COMPTAGE.csv")
+    a.to_html("Table.html")
+    html_file = a.to_html()
+    with open("/home/pi/Desktop/PFE_TCE/Main/csv_register/Table.html", 'r') as html_file:
+        html_file_content = html_file.read()
+
+    # defenir le document HTML
+    html = """\
         <html>
-    
+            
+            </head>
             <body>
                 <h1><mark style="color:red">  TCE arrêté ! </mark> </h1>
                 <h3>
                 <p>TCE a atteint la limite des nombres des câbles partiels testés, une intervention est nécessaire, </p>
                 <p>vérifier ci-dessous le nombre partiel et total atteint: </p>
                 </h3>
+                {html_file_content}
             </body>
         </html>
-        '''
+        """.format(html_file_content=html_file_content)
 
     ########################################
     email_from = "raspberrypiTCE@gmail.com"
     password = "pi@raspberrypi"            #
-    email_to = "chebihamza926@gmail.com"   #
+    email_to = "chebihamza926@gmail.com"  #
     ########################################
 
-# Generate today's date to be included in the email Subject
+# Générez la date d'aujourd'hui à inclure dans l'objet de l'e-mail
     date_str = pd.Timestamp.today().strftime('%Y-%m-%d')
 
-# Create a MIMEMultipart class, and set up the From, To, Subject fields
+# Créez une classe MIMEMultipart et configurez les champs From, To, Subject
     email_message = MIMEMultipart()
     email_message['From'] = email_from
     email_message['To'] = email_to
     email_message['Subject'] = f'Alerte sur létat du machine TCE - {date_str}'
 
-# Attach the html doc defined earlier, as a MIMEText html content type to the MIME message
+# Joignez le document html défini précédemment, en tant que type de contenu html MIMEText au message MIME
     email_message.attach(MIMEText(html, "html"))
+    #email_message.attach(MIMEText(filecontent, "html"))
 
 
-# next lines with convert the csv to html and attatch it
-#a = pd.read_csv("/home/pi/Desktop/PFE_TCE/Main/csv_register/COMPTAGE.csv")
-# a.to_html("COMPTAGE.html")
-#email_message.attach(MIMEText(a, "html"))
-#a = {}
-#
-#    csv_dict = csv.DictReader(csvfile)
-#    a = {}
-#    for i in csv_dict:
-#        a.update(i)
-#       # Define a function to attach files as MIMEApplication to the email
-#      ##############################################################
-# print(a)
-
-    def attach_file_to_email(email_message, filename="/home/pi/Desktop/PFE_TCE/Main/csv_register/COMPTAGE.csv"):
-        # Open the attachment file for reading in binary mode, and make it a MIMEApplication class
-        with open(filename, "rb") as f:
-            file_attachment = MIMEApplication(f.read())
-
-    # Add header/name to the attachments
-        file_attachment.add_header(
-            "Content-Disposition",
-            f"attachment; filename= {filename}",
-        )
-    # Attach the file to the message
-
-        email_message.attach(file_attachment)
-
-
-##############################################################
-# call attach fct
-    attach_file_to_email(email_message)
-
-# Convert it as a string
+# Convertez le message comme string
     email_string = email_message.as_string()
 
-# Connect to the Gmail SMTP server and Send Email
+# Connecter au serveur SMTP de Gmail et envoyez un e-mail
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
         server.login(email_from, password)
         server.sendmail(email_from, email_to, email_string)
         server.sendmail(
             email_from, "mahfoudh.yassin2000@gmail.com", email_string)
+
+
+send_mail()
