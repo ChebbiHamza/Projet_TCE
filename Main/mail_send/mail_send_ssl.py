@@ -14,7 +14,7 @@ import urllib.request
 
 def connect(host='http://google.com'):  # vérifier l'accés internet
     try:
-        urllib.request.urlopen(host)  # Python 3.x
+        urllib.request.urlopen(host)  # Python 3.xx
         return True
     except:
         return False
