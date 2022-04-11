@@ -201,7 +201,7 @@ try:
             mail_state = False
             GPIO.output(RLin, GPIO.LOW)
             if input_state == False:
-                print('ok')
+                # print('ok')
                 nombretotal += 1
                 nombrepartiel += 1
                 COMPTEUR = [{"Total:": nombretotal,

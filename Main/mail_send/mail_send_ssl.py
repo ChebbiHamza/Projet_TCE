@@ -23,7 +23,7 @@ def connect(host='http://google.com'):  # vérifier l'accés internet
 def send_mail():
 
     a = pd.read_csv("/home/pi/Desktop/PFE_TCE/Main/csv_register/COMPTAGE.csv")
-    a.to_html("Table.html")
+    a.to_html("/home/pi/Desktop/PFE_TCE/Main/csv_register/Table.html")
     html_file = a.to_html()
     with open("/home/pi/Desktop/PFE_TCE/Main/csv_register/Table.html", 'r') as html_file:
         html_file_content = html_file.read()
@@ -72,8 +72,3 @@ def send_mail():
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
         server.login(email_from, password)
         server.sendmail(email_from, email_to, email_string)
-        server.sendmail(
-            email_from, "mahfoudh.yassin2000@gmail.com", email_string)
-
-
-send_mail()
