@@ -11,11 +11,17 @@ GPIO.setmode(GPIO.BCM)
 # setup LCD
 lcd = LCD_I2C_DRIVER.lcd()
 
-mail_state = False
+red_led = 20
+green_led = 21
+mail_state = False  # to sent mail just one time
+mail_on_state = False  # to sent mail ON just one time
+mail_warning_state = False
 button = 17  # Button PIN BCM
 RLin = 23
-Limite_base = 100  # Nbr Limite
+Limite_base = 60  # Nbr Limite
 GPIO.setup(RLin, GPIO.OUT)
+GPIO.setup(red_led, GPIO.OUT)
+GPIO.setup(green_led, GPIO.OUT)
 
 listcp = ["Total:", "Partiel:"]
 listli = ["Nblimite:"]
@@ -200,6 +206,8 @@ try:
         if Nblimite > nombrepartiel:
             mail_state = False
             GPIO.output(RLin, GPIO.LOW)
+            GPIO.output(green_led, GPIO.HIGH)
+            GPIO.output(red_led, GPIO.LOW)
             if input_state == False:
                 # print('ok')
                 nombretotal += 1
@@ -210,9 +218,37 @@ try:
                 time.sleep(0.2)
 
                 read_display_csv()
+            if nombrepartiel == 0 and mail_on_state == False:
+                if mail_send_ssl.connect():
+                    mail_send_ssl.send_mail_TCE_on()
+                    lcd.lcd_clear()
+                    lcd.lcd_display_string('mail alert!', 2, 0)
+                    mail_on_state = True
+                    time.sleep(2)
+                    lcd.lcd_clear()
+                    read_display_csv()
+                else:
+                    lcd.lcd_display_string('No Internet!', 2, 0)
+                    mail_on_state = True
+                    time.sleep(2)
+                    lcd.lcd_clear()
+                    read_display_csv()
+            if Nblimite-5 == nombrepartiel and mail_warning_state == False:
+                if mail_send_ssl.connect():
+                    mail_send_ssl.send_mail_warning()
+                    lcd.lcd_clear()
+                    lcd.lcd_display_string('mail alert!', 2, 0)
+                    mail_on_state = True
+                    time.sleep(2)
+                    lcd.lcd_clear()
+                    read_display_csv()
+                    mail_warning_state = True
 
         else:
-
+            mail_warning_state = False
+            mail_on_state = False
+            GPIO.output(green_led, GPIO.LOW)
+            GPIO.output(red_led, GPIO.HIGH)
             lcd.lcd_clear()
             lcd.lcd_display_string('TCE bloque', 1, 0)
             GPIO.output(RLin, GPIO.HIGH)
