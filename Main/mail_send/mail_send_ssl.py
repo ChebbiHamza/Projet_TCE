@@ -113,7 +113,7 @@ def send_mail_TCE_on():
     email_message = MIMEMultipart()
     email_message['From'] = email_from
     email_message['To'] = email_to
-    email_message['Subject'] = f'Alerte sur l\'état du machine TCE - {date_str}'
+    email_message['Subject'] = f'Alerte sur maintenance préventive TCE - {date_str}'
 
 # Joignez le document html défini précédemment, en tant que type de contenu html MIMEText au message MIME
     email_message.attach(MIMEText(html, "html"))
